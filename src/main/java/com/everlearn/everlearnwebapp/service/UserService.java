@@ -6,6 +6,8 @@ import com.everlearn.everlearnwebapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserService {
 
@@ -14,8 +16,12 @@ public class UserService {
     @Autowired
     private SessionRepository sessionRepository;
 
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public Optional<User> findByEmail(String email){
+        return userRepository.findByEmail(email);
+    }
+
+    public void addUser(User user) {
+        userRepository.save(user);
     }
 
 
