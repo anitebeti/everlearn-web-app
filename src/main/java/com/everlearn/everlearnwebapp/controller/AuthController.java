@@ -4,7 +4,6 @@ import com.everlearn.everlearnwebapp.entity.User;
 import com.everlearn.everlearnwebapp.exception.UserAlreadyExistsException;
 import com.everlearn.everlearnwebapp.exception.UserAlreadyLoggedInException;
 import com.everlearn.everlearnwebapp.model.SignInRequest;
-import com.everlearn.everlearnwebapp.model.SignInResponse;
 import com.everlearn.everlearnwebapp.model.SignUpRequest;
 import com.everlearn.everlearnwebapp.security.JwtUtil;
 import com.everlearn.everlearnwebapp.service.AuthService;
@@ -45,7 +44,6 @@ public class AuthController {
             Optional<User> user = userService.findByEmail(email);
 
             String token = jwtUtil.createToken(user.get());
-            SignInResponse response = new SignInResponse(email, token);
             authService.signIn(email, token);
 
             return ResponseEntity.ok("Successfully logged in!");
@@ -62,7 +60,7 @@ public class AuthController {
                     request.getFirstName(),
                     request.getLastName(),
                     request.getEmail(),
-                    request.getTelephoneNumber(),
+                    request.getPhoneNumber(),
                     request.getPassword());
         } catch (ConstraintViolationException e){
             log.error(e.getClass().getSimpleName() + " was thrown while signing up.");

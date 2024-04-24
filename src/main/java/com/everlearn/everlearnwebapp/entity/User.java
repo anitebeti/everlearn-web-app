@@ -37,9 +37,9 @@ public class User {
     private String email;
 
     @Column
-    @NotNull(message = "Telephone number must not be null")
-    @NotBlank(message = "Telephone number must not be blank")
-    private String telephoneNumber;
+    @NotNull(message = "Phone number must not be null")
+    @NotBlank(message = "Phone number must not be blank")
+    private String phoneNumber;
 
     @Column
     @NotNull(message = "Password must not be null")
@@ -51,17 +51,17 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Set<RoleEnum> roles;
 
-    public User(String firstName, String lastName, String email, String telephoneNumber, String password, Set<RoleEnum> roles) {
+    public User(String firstName, String lastName, String email, String phoneNumber, String password, Set<RoleEnum> roles) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.telephoneNumber = telephoneNumber;
+        this.phoneNumber = phoneNumber;
         this.password = password;
         this.roles = roles;
     }
 
-    public User(String firstName, String lastName, String email, String telephoneNumber, String password) {
-        this(firstName, lastName, email, telephoneNumber, password, new HashSet<>());
+    public User(String firstName, String lastName, String email, String phoneNumber, String password) {
+        this(firstName, lastName, email, phoneNumber, password, new HashSet<>());
     }
 
     public boolean addRole(RoleEnum role) {

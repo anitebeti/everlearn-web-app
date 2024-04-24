@@ -8,6 +8,7 @@ import com.everlearn.everlearnwebapp.exception.UserAlreadyLoggedInException;
 import com.everlearn.everlearnwebapp.repository.SessionRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,8 @@ public class AuthService {
     private SessionRepository sessionRepository;
     @Autowired
     private UserService userService;
+    @Autowired
+    private BCryptPasswordEncoder encoder;
 
     public Session signIn(String email, String token) throws UserAlreadyLoggedInException {
         Optional<Session> session = sessionRepository.findByEmail(email);
@@ -32,14 +35,16 @@ public class AuthService {
         }
     }
 
-    public void signUp(String firstName, String lastName, String email, String telephoneNumber, String password)
+    public void signUp(String firstName, String lastName, String email, String phoneNumber, String password)
             throws UserAlreadyExistsException {
 
         if (userService.findByEmail(email).isPresent()) {
             throw new UserAlreadyExistsException("Account already created for this email.");
         }
 
-        User newUser = new User(firstName, lastName, email, telephoneNumber, password);
+        String encodedPassword = encoder.encode(password);
+
+        User newUser = new User(firstName, lastName, email, phoneNumber, encodedPassword);
         newUser.addRole(RoleEnum.PARTICIPANT);
         userService.addUser(newUser);
     }
