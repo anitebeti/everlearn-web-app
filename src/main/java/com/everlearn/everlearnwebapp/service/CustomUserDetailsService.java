@@ -23,7 +23,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         Optional<User> user = userService.findByEmail(email);
 
         if (user.isEmpty()) {
-            throw new UsernameNotFoundException("UserNAME not found with email: " + email);
+            throw new UsernameNotFoundException("User not found with email: " + email);
         }
 
         List<String> roles = user.get().getRoles()

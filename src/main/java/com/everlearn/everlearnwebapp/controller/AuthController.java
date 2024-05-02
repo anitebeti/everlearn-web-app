@@ -4,6 +4,7 @@ import com.everlearn.everlearnwebapp.entity.User;
 import com.everlearn.everlearnwebapp.exception.UserAlreadyExistsException;
 import com.everlearn.everlearnwebapp.exception.UserAlreadyLoggedInException;
 import com.everlearn.everlearnwebapp.model.SignInRequest;
+import com.everlearn.everlearnwebapp.model.SignInResponse;
 import com.everlearn.everlearnwebapp.model.SignUpRequest;
 import com.everlearn.everlearnwebapp.security.JwtUtil;
 import com.everlearn.everlearnwebapp.service.AuthService;
@@ -15,10 +16,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -40,13 +44,20 @@ public class AuthController {
         try {
             Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+            SecurityContextHolder.getContext().setAuthentication(auth);
+
             String email = auth.getName();
             Optional<User> user = userService.findByEmail(email);
 
             String token = jwtUtil.createToken(user.get());
-            authService.signIn(email, token);
-
-            return ResponseEntity.ok("Successfully logged in!");
+            SignInResponse response = new SignInResponse(
+                    user.get().getFirstName(),
+                    user.get().getLastName(),
+                    user.get().getPhoneNumber(),
+                    user.get().getEmail(),
+                    user.get().getRoles(),
+                    token);
+            return ResponseEntity.ok(response);
         } catch (ConstraintViolationException e){
             log.error(e.getClass().getSimpleName() + " was thrown while signing in.");
             throw e;

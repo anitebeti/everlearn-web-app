@@ -28,6 +28,7 @@ public class JwtUtil {
         claims.put("firstName", user.getFirstName());
         claims.put("lastName", user.getLastName());
         claims.put("phoneNumber", user.getPhoneNumber());
+        claims.put("roles", user.getRoles());
         Date tokenCreateTime = new Date();
         Date tokenValidity = new Date(tokenCreateTime.getTime() + TimeUnit.MINUTES.toMillis(accessTokenValidity));
         return Jwts.builder()
@@ -38,13 +39,12 @@ public class JwtUtil {
     }
 
     private Claims parseJwtClaims(String token) {
-        return jwtParser.parseClaimsJwt(token).getBody();
+        return jwtParser.parseClaimsJws(token).getBody();
     }
 
     public Claims resolveClaims(HttpServletRequest request) {
         try {
             String token = resolveToken(request);
-            //TODO: Optional
             if (token != null) {
                 return parseJwtClaims(token);
             }
@@ -60,7 +60,6 @@ public class JwtUtil {
 
     public String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader(TOKEN_HEADER);
-        //TODO: Optional
         if (bearerToken != null && bearerToken.startsWith(TOKEN_PREFIX)) {
             return bearerToken.substring(TOKEN_PREFIX.length());
         }
