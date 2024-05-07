@@ -3,7 +3,7 @@ package com.everlearn.everlearnwebapp.service;
 import com.everlearn.everlearnwebapp.entity.User;
 import com.everlearn.everlearnwebapp.entity.RoleEnum;
 import com.everlearn.everlearnwebapp.exception.UserAlreadyExistsException;
-import com.everlearn.everlearnwebapp.repository.SessionRepository;
+import com.everlearn.everlearnwebapp.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,12 +16,14 @@ public class AuthService {
     @Autowired
     private UserService userService;
     @Autowired
+    private UserRepository userRepository;
+    @Autowired
     private BCryptPasswordEncoder encoder;
 
     public void signUp(String firstName, String lastName, String email, String phoneNumber, String password)
             throws UserAlreadyExistsException {
 
-        if (userService.findByEmail(email).isPresent()) {
+        if (userRepository.findByEmail(email).isPresent()) {
             throw new UserAlreadyExistsException("Account already created for this email.");
         }
 

@@ -21,10 +21,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
 @RestController
 @Slf4j
 public class AuthController {
@@ -47,15 +43,16 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(auth);
 
             String email = auth.getName();
-            Optional<User> user = userService.findByEmail(email);
+            User user = userService.findByEmail(email);
 
-            String token = jwtUtil.createToken(user.get());
+            String token = jwtUtil.createToken(user);
             SignInResponse response = new SignInResponse(
-                    user.get().getFirstName(),
-                    user.get().getLastName(),
-                    user.get().getPhoneNumber(),
-                    user.get().getEmail(),
-                    user.get().getRoles(),
+                    user.getId(),
+                    user.getFirstName(),
+                    user.getLastName(),
+                    user.getPhoneNumber(),
+                    user.getEmail(),
+                    user.getRoles(),
                     token);
             return ResponseEntity.ok(response);
         } catch (ConstraintViolationException e){

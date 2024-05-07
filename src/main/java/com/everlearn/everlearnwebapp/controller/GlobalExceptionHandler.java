@@ -1,5 +1,6 @@
 package com.everlearn.everlearnwebapp.controller;
 
+import com.everlearn.everlearnwebapp.exception.AlreadySubscribedException;
 import com.everlearn.everlearnwebapp.exception.UserAlreadyExistsException;
 import com.everlearn.everlearnwebapp.exception.UserAlreadyLoggedInException;
 import jakarta.validation.ConstraintViolationException;
@@ -10,11 +11,24 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.io.FileNotFoundException;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(AlreadySubscribedException.class)
+    public ResponseEntity<String> handleAlreadySubscribedException(AlreadySubscribedException e) {
+        log.error(e.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+    }
+
+    @ExceptionHandler(FileNotFoundException.class)
+    public ResponseEntity<String> handleFileNotFoundException(FileNotFoundException e) {
+        log.error(e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("File not found");
+    }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<String> handleBadCredentialsException(BadCredentialsException e) {

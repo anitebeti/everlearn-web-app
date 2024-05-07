@@ -9,7 +9,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,20 +19,16 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Optional<User> user = userService.findByEmail(email);
+        User user = userService.findByEmail(email);
 
-        if (user.isEmpty()) {
-            throw new UsernameNotFoundException("User not found with email: " + email);
-        }
-
-        List<String> roles = user.get().getRoles()
+        List<String> roles = user.getRoles()
                 .stream()
                 .map(RoleEnum::name)
                 .collect(Collectors.toList());
 
         UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
-                .username(user.get().getEmail())
-                .password(user.get().getPassword())
+                .username(user.getEmail())
+                .password(user.getPassword())
                 .roles(roles.toArray(new String[0]))
                 .build();
         return userDetails;

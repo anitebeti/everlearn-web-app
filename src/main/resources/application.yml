@@ -10,3 +10,11 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+#logging:
+#  level:
+#    org.springframework.security: DEBUG
+#    org.hibernate: DEBUG

@@ -28,7 +28,6 @@ public class JwtUtil {
         claims.put("firstName", user.getFirstName());
         claims.put("lastName", user.getLastName());
         claims.put("phoneNumber", user.getPhoneNumber());
-        claims.put("roles", user.getRoles());
         Date tokenCreateTime = new Date();
         Date tokenValidity = new Date(tokenCreateTime.getTime() + TimeUnit.MINUTES.toMillis(accessTokenValidity));
         return Jwts.builder()
