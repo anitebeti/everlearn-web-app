@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +44,23 @@ public class UserService {
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    public void editInfo(Long id, String firstName, String lastName, String email, String phoneNumber) {
+        User user = findById(id);
+        if (!user.getFirstName().equals(firstName)) {
+            user.setFirstName(firstName);
+        }
+        if (!user.getLastName().equals(lastName)) {
+            user.setLastName(lastName);
+        }
+        if (!user.getEmail().equals(email)) {
+            user.setEmail(email);
+        }
+        if (!user.getPhoneNumber().equals(phoneNumber)) {
+            user.setPhoneNumber(phoneNumber);
+        }
+        userRepository.save(user);
     }
 
 }

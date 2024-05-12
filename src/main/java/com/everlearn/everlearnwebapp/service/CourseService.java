@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -45,6 +46,26 @@ public class CourseService {
         return courseRepository.findAll();
     }
 
+    @Transactional
+    public Stream<Course> getSubscribedCourses(Long userId) {
+        User user = userService.findById(userId);
+        List<Course> courses = courseRepository.findAllByUsers(user);
+        return courses.stream();
+    }
+
+    @Transactional
+    public Stream<Course> getNonSubscribedCourses(Long userId) {
+        User user = userService.findById(userId);
+
+        List<Course> allCourses = courseRepository.findAll();
+        List<Course> subscribedCourses = courseRepository.findAllByUsers(user);
+        List<Course> nonSubscribedCourses = new ArrayList<>(allCourses);
+        nonSubscribedCourses.removeAll(subscribedCourses);
+
+        return nonSubscribedCourses.stream();
+    }
+
+    @Transactional
     public void subscribeUserToCourse(Long userId, Long courseId) throws FileNotFoundException, AlreadySubscribedException {
         User user = userService.findById(userId);
         Course course = getCourse(courseId);

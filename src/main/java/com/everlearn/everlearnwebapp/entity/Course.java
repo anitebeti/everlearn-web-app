@@ -3,9 +3,6 @@ package com.everlearn.everlearnwebapp.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
@@ -35,12 +32,8 @@ public class Course {
     private Set<User> users;
 
     @ManyToOne(fetch = FetchType.EAGER)
-//            (fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "author_id")
-//    @NotNull(message = "Author must not be null")
-//    @NotBlank(message = "Author name must not be blank")
     private User author;
-
 
     public Course() {}
 

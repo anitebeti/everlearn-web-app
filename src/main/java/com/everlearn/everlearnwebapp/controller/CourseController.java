@@ -3,6 +3,7 @@ package com.everlearn.everlearnwebapp.controller;
 import com.everlearn.everlearnwebapp.entity.Course;
 import com.everlearn.everlearnwebapp.exception.AlreadySubscribedException;
 import com.everlearn.everlearnwebapp.model.CourseDTO;
+import com.everlearn.everlearnwebapp.model.GetAuthorCourseListResponse;
 import com.everlearn.everlearnwebapp.model.SubscribeRequest;
 import com.everlearn.everlearnwebapp.model.UnsubscribedCourseDTO;
 import com.everlearn.everlearnwebapp.service.CourseService;
@@ -38,27 +39,19 @@ public class CourseController {
 
     @GetMapping("/author/courses")
     @PreAuthorize("hasRole('AUTHOR')")
-    public ResponseEntity<List<CourseDTO>> getAuthorCourseList(@RequestParam Long userId) {
-        List<CourseDTO> files = courseService.getAuthorCourseList(userId).map(
-                file -> {
-                    String fileDownloadUri = ServletUriComponentsBuilder
-                            .fromCurrentContextPath()
-                            .path("/author/courses/")
-                            .path(file.getId().toString())
-                            .toUriString();
+    public ResponseEntity<List<GetAuthorCourseListResponse>> getAuthorCourseList(@RequestParam Long userId) {
+        List<GetAuthorCourseListResponse> courses = courseService.getAuthorCourseList(userId)
+                .map(course -> new GetAuthorCourseListResponse(
+                        createGetCourseResponse(course),
+                        course.getUsers().stream()
+                                .map(user -> user.getId())
+                                .collect(Collectors.toList())))
+                .collect(Collectors.toList());
 
-                    return new CourseDTO(
-                            file.getCourseName(),
-                            file.getDescription(),
-                            fileDownloadUri,
-                            file.getType(),
-                            file.getData().length);
-                }).collect(Collectors.toList());
-
-        return ResponseEntity.ok(files);
+        return ResponseEntity.ok(courses);
     }
 
-    @GetMapping("author/courses/{id}")
+    @GetMapping("/courses/{id}")
     public ResponseEntity<byte[]> getCourse(@PathVariable Long id) throws FileNotFoundException {
         Course course = courseService.getCourse(id);
         return ResponseEntity.ok()
@@ -76,9 +69,40 @@ public class CourseController {
         return ResponseEntity.ok(unsubscribedCourses);
     }
 
+    @GetMapping("/getNonSubscribedCourses/{userId}")
+    public ResponseEntity<List<CourseDTO>> getNonSubscribedCourses(@PathVariable Long userId) {
+        List<CourseDTO> nonSubscribedCourses = courseService.getNonSubscribedCourses(userId).map(
+                course -> createGetCourseResponse(course)).collect(Collectors.toList());
+        return ResponseEntity.ok(nonSubscribedCourses);
+    }
+
+    @GetMapping("/getSubscribedCourses/{userId}")
+    public ResponseEntity<List<CourseDTO>> getSubscribedCourses(@PathVariable Long userId) {
+        List<CourseDTO> subscribedCourses = courseService.getSubscribedCourses(userId).map(
+                course -> createGetCourseResponse(course)).collect(Collectors.toList());
+        return ResponseEntity.ok(subscribedCourses);
+    }
+
     @PostMapping("/subscribe")
     public ResponseEntity subscribeToCourse(@RequestBody SubscribeRequest request) throws AlreadySubscribedException, FileNotFoundException {
         courseService.subscribeUserToCourse(request.getUserId(), request.getCourseId());
         return ResponseEntity.ok("User successfully subscribed to course!");
     }
+
+    private CourseDTO createGetCourseResponse(Course course) {
+        String fileDownloadUri = ServletUriComponentsBuilder
+            .fromCurrentContextPath()
+            .path("/courses/")
+            .path(course.getId().toString())
+            .toUriString();
+
+        return new CourseDTO(
+                course.getId(),
+                course.getCourseName(),
+                course.getDescription(),
+                fileDownloadUri,
+                course.getType(),
+                course.getData().length);
+    }
+
 }

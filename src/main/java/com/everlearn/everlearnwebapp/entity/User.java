@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -46,6 +44,10 @@ public class User {
     @NotBlank(message = "Password must not be blank")
     private String password;
 
+    @OneToMany(mappedBy = "user")
+            //, fetch = FetchType.EAGER)
+    private List<Photo> photos;
+
     @ElementCollection(targetClass = RoleEnum.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
@@ -54,7 +56,7 @@ public class User {
     @OneToMany(mappedBy = "author")
     private List<Course> authoredCourses;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany
     @JoinTable(
             name="user_courses",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -73,6 +75,7 @@ public class User {
         this.roles = roles;
         this.authoredCourses = new ArrayList<>();
         this.subscribedCourses = new ArrayList<>();
+        this.photos = new ArrayList<>();
     }
 
     public User(String firstName, String lastName, String email, String phoneNumber, String password) {
@@ -82,7 +85,6 @@ public class User {
     public boolean addRole(RoleEnum role) {
         return roles.add(role);
     }
-
 
     public Long getId() {
         return id;
@@ -130,6 +132,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public List<Photo> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(List<Photo> photos) {
+        this.photos = photos;
     }
 
     public Set<RoleEnum> getRoles() {
